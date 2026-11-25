@@ -18,6 +18,12 @@ import {
   getMissionCompletionStatus,
 } from './components/EvidenceTeacherView';
 import { MissionCompletionScreen } from './components/MissionCompletionScreen';
+import {
+  safeScrollToTop,
+  safeStorageGet,
+  safeStorageRemove,
+  safeStorageSet,
+} from './utils/iframeSafe';
 
 const STORAGE_KEY = 'arena_pecut_30m_portfolio_v1';
 
@@ -55,7 +61,7 @@ function createInitialPortfolio(): PupilPortfolio {
 
 function loadPortfolio(): PupilPortfolio {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = safeStorageGet(STORAGE_KEY);
     if (!raw) return createInitialPortfolio();
     const parsed = JSON.parse(raw) as Partial<PupilPortfolio>;
     const base = createInitialPortfolio();
@@ -140,7 +146,7 @@ export default function App() {
           })),
         })),
       };
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(compactPortfolio));
+      safeStorageSet(STORAGE_KEY, JSON.stringify(compactPortfolio));
     } catch {
       // Ignore storage quota errors gracefully
     }
@@ -160,7 +166,7 @@ export default function App() {
       );
     }
     setScreen(next);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    safeScrollToTop();
   };
 
   const handleUpdateTeacherValidation = (validation: TeacherValidation) => {
@@ -173,11 +179,7 @@ export default function App() {
   const handleConfirmRestart = () => {
     const fresh = createInitialPortfolio();
     setPortfolio(fresh);
-    try {
-      localStorage.removeItem(STORAGE_KEY);
-    } catch {
-      // ignore
-    }
+    safeStorageRemove(STORAGE_KEY);
     setConfirmResetOpen(false);
     handleNavigate('home');
   };

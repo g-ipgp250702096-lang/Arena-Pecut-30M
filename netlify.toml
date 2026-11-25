@@ -1,0 +1,39 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Content-Security-Policy = "frame-ancestors 'self' https:;"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    X-Content-Type-Options = "nosniff"
+
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+    Cross-Origin-Resource-Policy = "cross-origin"
+
+[[headers]]
+  for = "/src/assets/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+    Cross-Origin-Resource-Policy = "cross-origin"
+
+[[headers]]
+  for = "/mediapipe-wasm/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+    Cross-Origin-Resource-Policy = "cross-origin"
+
+[[headers]]
+  for = "/mediapipe-models/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+    Cross-Origin-Resource-Policy = "cross-origin"

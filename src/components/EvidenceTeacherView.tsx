@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { ActiveMode, PupilPortfolio, TeacherValidation } from '../types/arena';
 import { ASSETS, DETEKTIF_TEKNIK_CASES, HOME_QUIZ_QUESTIONS } from '../data/curriculumContent';
+import { safeDownloadBlob, safePrint } from '../utils/iframeSafe';
 
 export interface MissionCompletionStatus {
   activeMode: ActiveMode;
@@ -136,16 +137,12 @@ export const EvidenceTeacherView: React.FC<EvidenceTeacherViewProps> = ({
     const blob = new Blob([JSON.stringify(portfolio, null, 2)], {
       type: 'application/json',
     });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `rekod-arena-pecut-${missionStatus.activeMode}-${(
+    const filename = `rekod-arena-pecut-${missionStatus.activeMode}-${(
       portfolio.pupilName || 'murid'
     )
       .toLowerCase()
       .replace(/\s+/g, '-')}.json`;
-    link.click();
-    URL.revokeObjectURL(url);
+    safeDownloadBlob(blob, filename);
   };
 
   return (
@@ -225,7 +222,9 @@ export const EvidenceTeacherView: React.FC<EvidenceTeacherViewProps> = ({
           <div className="no-print flex flex-wrap gap-2">
             <button
               type="button"
-              onClick={() => window.print()}
+              onClick={() => {
+                safePrint();
+              }}
               className="cursor-pointer inline-flex items-center gap-1.5 rounded-xl border border-white/15 bg-white/5 px-3.5 py-2 text-xs font-semibold text-[#F7F5FC] hover:bg-white/10"
             >
               <Printer className="h-3.5 w-3.5" />

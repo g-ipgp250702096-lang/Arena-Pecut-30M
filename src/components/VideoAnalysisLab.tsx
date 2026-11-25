@@ -221,18 +221,46 @@ export const VideoAnalysisLab: React.FC<VideoAnalysisLabProps> = ({
       }, 60);
     } catch {
       setUploadError(
-        'Akses kamera tidak dibenarkan atau tiada kamera dikesan. Anda masih boleh memuat naik fail video sedia ada.'
+        'Akses kamera tidak dibenarkan dalam paparan terbenam ini atau tiada kamera dikesan. Anda masih boleh memuat naik fail video sedia ada menggunakan butang Muat Naik Video.'
       );
     }
   };
 
   const handleStartRecording = () => {
     if (!mediaStreamRef.current) return;
+    if (typeof MediaRecorder === 'undefined') {
+      setUploadError(
+        'Pelayar ini tidak menyokong rakaman video secara langsung. Sila guna butang Muat Naik Video.'
+      );
+      stopCameraStream();
+      return;
+    }
+
     recordedChunksRef.current = [];
-    const mimeType = MediaRecorder.isTypeSupported('video/webm;codecs=vp9')
-      ? 'video/webm;codecs=vp9'
-      : 'video/webm';
-    const recorder = new MediaRecorder(mediaStreamRef.current, { mimeType });
+    const candidateTypes = [
+      'video/webm;codecs=vp9',
+      'video/webm;codecs=vp8',
+      'video/webm',
+      'video/mp4',
+    ];
+    const supportedType =
+      typeof MediaRecorder.isTypeSupported === 'function'
+        ? candidateTypes.find((t) => MediaRecorder.isTypeSupported(t))
+        : undefined;
+
+    let recorder: MediaRecorder;
+    try {
+      recorder = supportedType
+        ? new MediaRecorder(mediaStreamRef.current, { mimeType: supportedType })
+        : new MediaRecorder(mediaStreamRef.current);
+    } catch {
+      setUploadError(
+        'Rakaman kamera tidak dapat dimulakan dalam pelayar ini. Sila guna butang Muat Naik Video.'
+      );
+      stopCameraStream();
+      return;
+    }
+
     mediaRecorderRef.current = recorder;
 
     recorder.ondataavailable = (ev) => {
@@ -240,11 +268,13 @@ export const VideoAnalysisLab: React.FC<VideoAnalysisLabProps> = ({
     };
 
     recorder.onstop = () => {
-      const blob = new Blob(recordedChunksRef.current, { type: 'video/webm' });
+      const outputMime = recorder.mimeType || supportedType || 'video/webm';
+      const ext = outputMime.includes('mp4') ? 'mp4' : 'webm';
+      const blob = new Blob(recordedChunksRef.current, { type: outputMime });
       const capturedFile = new File(
         [blob],
-        `pecut-percubaan-${attemptNumber}.webm`,
-        { type: 'video/webm' }
+        `pecut-percubaan-${attemptNumber}.${ext}`,
+        { type: outputMime }
       );
       stopCameraStream();
       handleSelectedFile(capturedFile);

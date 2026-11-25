@@ -25,6 +25,14 @@ export default defineConfig(() => {
           if (fs.existsSync(distDir) && fs.existsSync(srcAssets)) {
             fs.cpSync(srcAssets, distAssets, {recursive: true, force: true});
           }
+          const mpWasmSrc = path.resolve(
+            __dirname,
+            'node_modules/@mediapipe/tasks-vision/wasm'
+          );
+          const mpWasmDist = path.resolve(distDir, 'mediapipe-wasm');
+          if (fs.existsSync(distDir) && fs.existsSync(mpWasmSrc)) {
+            fs.cpSync(mpWasmSrc, mpWasmDist, {recursive: true, force: true});
+          }
         },
       },
     ],

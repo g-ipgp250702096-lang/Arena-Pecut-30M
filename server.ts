@@ -11,6 +11,12 @@ const PORT = Number(process.env.PORT || 3000);
 
 async function startServer() {
   const app = express();
+  app.use((_req, res, next) => {
+    res.setHeader('Content-Security-Policy', "frame-ancestors 'self' https:;");
+    res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    next();
+  });
   app.use(express.json({ limit: '4mb' }));
 
   // Serve MediaPipe Tasks Vision WASM locally so optional frame landmark preview works offline
