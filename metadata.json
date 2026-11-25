@@ -1,0 +1,6 @@
+{
+  "name": "ARENA PECUT 30 METER",
+  "description": "Aplikasi pembelajaran digital Pendidikan Jasmani Tahun 5 untuk kemahiran larian pecut 30 meter dengan Analisis Video Berpandukan Guru dan bimbingan visual Arif & Aya.",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": []
+}
